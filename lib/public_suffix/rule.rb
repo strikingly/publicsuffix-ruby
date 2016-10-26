@@ -380,7 +380,7 @@ module PublicSuffix
     #
     # @return [PublicSuffix::Rule::Wildcard] The default rule.
     def self.default
-      factory(STAR)
+      nil
     end
 
   end
