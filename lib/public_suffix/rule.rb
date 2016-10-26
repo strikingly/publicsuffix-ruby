@@ -318,6 +318,22 @@ module PublicSuffix
       end
 
     end
+    
+    class IDNRule < Base
+      def initialize(definition, **options)
+        super(definition, **options)
+      end
+      def allow?(domain)
+        ::PublicSuffix::Domain.domain_to_labels(domain).any? { |label| label =~ /\Axn--/ }
+      end
+      def parts
+        @parts ||= @value.split('.')
+      end
+      def decompose(domain)
+        matches = domain.to_s.match(/\A(.*)\.([^.]*)\z/)
+        matches ? matches[1..2] : [nil, nil]
+      end
+    end
 
 
     # Takes the +name+ of the rule, detects the specific rule class
