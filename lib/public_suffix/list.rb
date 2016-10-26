@@ -241,11 +241,15 @@ module PublicSuffix
     # @param  [PublicSuffix::Rule::*] default The default rule to return in case no rule matches.
     # @return [PublicSuffix::Rule::*]
     def find(name, default: default_rule, **options)
-      rule = select(name, **options).inject do |l, r|
-        return r if r.class == Rule::Exception
-        l.length > r.length ? l : r
+      if Domain.name_to_labels(name).any? { |label| label =~ /\Axn--/ }
+        Rule::IDNRule.new(name)
+      else
+        rule = select(name, **options).inject do |l, r|
+          return r if r.class == Rule::Exception
+          l.length > r.length ? l : r
+        end
+        rule || default
       end
-      rule || default
     end
 
     # Selects all the rules matching given domain.
