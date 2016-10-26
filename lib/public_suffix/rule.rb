@@ -323,15 +323,22 @@ module PublicSuffix
       def initialize(definition, **options)
         super(definition, **options)
       end
-      def allow?(domain)
-        ::PublicSuffix::Domain.domain_to_labels(domain).any? { |label| label =~ /\Axn--/ }
+      
+      def length
+        @length ||= parts.length
       end
+      
       def parts
         @parts ||= @value.split('.')
       end
+      
       def decompose(domain)
-        matches = domain.to_s.match(/\A(.*)\.([^.]*)\z/)
-        matches ? matches[1..2] : [nil, nil]
+        if Domain.domain_to_labels(domain).any? { |label| label =~ /\Axn--/ }
+          matches = domain.to_s.match(/\A(.*)\.([^.]*)\z/)
+          matches ? matches[1..2] : [nil, nil]
+        else
+          [nil, nil]
+        end
       end
     end
 
