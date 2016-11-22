@@ -333,7 +333,7 @@ module PublicSuffix
       end
       
       def decompose(domain)
-        if Domain.domain_to_labels(domain).any? { |label| label =~ /\Axn--/ }
+        if Domain.name_to_labels(domain).any? { |label| label =~ /\Axn--/ }
           matches = domain.to_s.match(/\A(.*)\.([^.]*)\z/)
           matches ? matches[1..2] : [nil, nil]
         else
