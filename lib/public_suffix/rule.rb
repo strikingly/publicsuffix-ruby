@@ -318,6 +318,29 @@ module PublicSuffix
       end
 
     end
+    
+    class IDNRule < Base
+      def initialize(definition, **options)
+        super(definition, **options)
+      end
+      
+      def length
+        @length ||= parts.length
+      end
+      
+      def parts
+        @parts ||= @value.split('.')
+      end
+      
+      def decompose(domain)
+        if Domain.name_to_labels(domain).any? { |label| label =~ /\Axn--/ }
+          matches = domain.to_s.match(/\A(.*)\.([^.]*)\z/)
+          matches ? matches[1..2] : [nil, nil]
+        else
+          [nil, nil]
+        end
+      end
+    end
 
 
     # Takes the +name+ of the rule, detects the specific rule class
@@ -357,7 +380,7 @@ module PublicSuffix
     #
     # @return [PublicSuffix::Rule::Wildcard] The default rule.
     def self.default
-      factory(STAR)
+      nil
     end
 
   end
